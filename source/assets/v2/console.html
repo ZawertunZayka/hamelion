@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Console Interface</title>
+    <style>
+        body {
+    overflow: hidden;
+
+            font-family: monospace;
+            background-color: black;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+        .console {
+            width: 100%;
+            height: 80vh;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #333;
+            background-color: #1e1e1e;
+            color: white;
+            white-space: pre-wrap; /* So that text wraps */
+            word-wrap: break-word;
+        }
+        .input-line {
+            border-top: 1px solid #444;
+            padding-top: 10px;
+        }
+        input {
+            background-color: #1e1e1e;
+            border: none;
+            color: white;
+            width: 100%;
+            font-size: 16px;
+            outline: none;
+        }
+        input:focus {
+            border: none;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="console" id="console"></div>
+<div class="input-line">
+    <input type="text" id="input" autofocus />
+</div>
+
+<script>
+    function sendCommand(cmd,headers){
+        return new Promise((res,rej)=>{
+            fetch('/'+cmd,{
+                method: 'POST',
+                headers
+            }).then(async r=>res(await r.text()))
+            .catch(er=>rej(er))
+        })
+    }
+    // Function to convert ANSI color codes to HTML
+    function ansiToHtml(ansiStr) {
+
+        
+        const ANSI_CODES = {
+            30: 'black',
+            31: 'red',
+            32: 'green',
+            33: 'yellow',
+            34: 'blue',
+            35: 'magenta',
+            36: 'cyan',
+            37: 'white',
+            90: 'gray',
+            91: 'lightcoral',
+            92: 'lightgreen',
+            93: 'lightyellow',
+            94: 'lightblue',
+            95: 'lightpink',
+            96: 'lightcyan',
+            97: 'lightgray',
+        };
+
+        return '<span style="color: white;">'+ansiStr.replaceAll(/\x1b\[(\d+)(;(\d+))?m/g, (match, p1) => {
+            const colorCode = parseInt(p1, 10);
+            const color = ANSI_CODES[colorCode] || 'black'; // Default to black if no match
+            return `<span style="color:${color}">`;
+            // return `</span><span style="${ANSI_CODES[p]}">`;
+        })
+    }
+
+    // Function to append new line to console
+    function appendLine(text) {
+        const consoleDiv = document.getElementById('console');
+        const newLine = document.createElement('div');
+        newLine.innerHTML = ansiToHtml(text); // Convert ANSI codes to HTML
+        consoleDiv.appendChild(newLine);
+        consoleDiv.scrollTop = consoleDiv.scrollHeight; // Scroll to bottom
+    }
+
+    // Handle input submission
+    const inputField = document.getElementById('input');
+    inputField.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' && inputField.value.trim() !== '') {
+            appendLine(inputField.value); // Display typed input
+            inputField.value = ''; // Clear input
+        }
+    });
+
+    // Example of server sending new lines
+    window.onload = () =>setTimeout(()=>sendCommand('getConsole').then(ls=>{
+        JSON.parse(ls).forEach(v=>appendLine(v))
+        
+    }),100)
+
+    // Simulate the server response every 3 seconds
+    simulateServerResponse();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XAMELEON GUI</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div id="logo" class="fade-in">
+        <img src="Logo.png" alt="Xameleon Logo">
+    </div>
+
+    <div class="menu">
+
+
+        <div class="container">
+            <aside class="sidebar">
+                <button onclick="showOne('content','status')" class="tab">Статус</button>
+                <button onclick="showOne('content','start')" class="tab">Подключение</button>
+                <button onclick="showOne('content','config')" class="tab">Конфиг</button>
+                <button onclick="confirm('Вы точно хотите выйти?')&&sendCommand('restart')" class="tab">Отключится от сервера</button>
+            </aside>
+
+            <div class="content" id="content">
+                <div id="start" class="tab-content hidden">
+                    <h2>Подключится</h2>
+                    <p>Выберите устройство:</p>
+                    <button class="device-btn" onclick="showOne('insts','pc')">Это устройство</button>
+                    <button class="device-btn" onclick="showOne('insts','mobile')">Телефон/Второй ПК</button>
+                    <div id="insts">
+
+                        <div id="pc" class="instructions hidden">
+                            <p>Подключайтесь с чита сюда</p>
+                            <br>
+                            <p id="ippc">Здесь инфа для пк</p>
+                            <button class="launch-btn" , onclick="copy('ippc')">Скопировать</button>
+                        </div>
+                        <div id="mobile" class="instructions hidden">
+                            <p>
+                                Убедитесь, что вы находитесь в одной сети с вторым устройством
+                                <br />
+                                Подключитесь по адресу в общей сети (скорее всего начинается на 192)
+                            </p>
+                            <br>
+                            <p id="ipmb">айпишки</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="config" class="tab-content hidden">
+                    <h2>Настройки</h2>
+
+                    <div class="settings">
+                        <div class="setting-item">
+                            <span class="setting-label">Ник:</span>
+                            <input type="text" id="cfg_accountname" class="setting-input" placeholder="Введите ник">
+                        </div>
+
+                        <div class="setting-item">
+                            <span class="setting-label">Сервер:</span>
+                            <input type="text" id="cfg_host" class="setting-input" placeholder="Введите сервер">
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-label">Порт сервера:</span>
+                            <input type="text" id="cfg_port" class="setting-input" placeholder="Введите сервер">
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-label">Версия:</span>
+                            <div class="slider-container">
+                                <input type="range" min="0" max="10" step="1" value="0.5" class="version-slider"
+                                    id="versionSlider" oninput="updateVersionSmooth()">
+                                <span id="versionDisplay">1.16.5</span>
+                            </div>
+
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-label">Включить обход на funtime.su</span>
+                            <label class="switch">
+                                <input type="checkbox" id="cfg_funtimeMode">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-label">Порт прокси:</span>
+                            <input type="text" id="cfg_proxyport" class="setting-input" placeholder="Введите локальный порт (25565)">
+                        </div>
+
+                        <div class="setting-item">
+                            <span class="setting-label">Порт ГУИ:</span>
+                            <input type="text" id="cfg_GUIPort" class="setting-input" placeholder="Введите локальный порт (25565)">
+                        </div>
+
+                       
+
+                        <div class="setting-item">
+                            <span class="setting-label">Скрывать GUI при отключении?</span>
+                            <label class="switch">
+                                <input type="checkbox" id="cfg_hideOnDisconnect">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        
+                    </div>
+                    <button class="launch-btn" , onclick="saveConfig()">Сохранить</button>
+
+                </div>
+
+                <div id="status" class="tab-content">
+                    <h2 class="centered">Клиенты</h2>
+                    <div class="status">
+                        <div>
+                            <p class="setting-label">Основной клиент</p>
+                            <img src="./client.jpg">
+                            <p class="smallerfont" id="status1">Загрузка...</p>
+                        </div>
+                        <div>
+                            <p class="setting-label">Второй клиент</p>
+                            <img src="./client.jpg">
+                            <p class="smallerfont" id="status2">Загрузка...</p>
+                        </div>
+                    </div>
+                    <button class="launch-btn" , onclick="sendCommand('switchClients').then(alert)">Переключить управление</button>
+
+                </div>
+
+                
+            </div>
+        </div>
+
+        <script src="script.js"></script>
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XAMELEON | v 3.0</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    .input-field {
+      width: 90%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #444;
+      border-radius: 5px;
+      background: #222;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      text-align: center;
+      transition: border 0.3s;
+    }
+
+    .input-field:focus {
+      border-color: #ff6200;
+      box-shadow: 0 0 5px rgba(255, 98, 0, 0.8);
+    }
+
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #000;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .loading-screen {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #000;
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      z-index: 10;
+    }
+    
+
+    .tabs button {
+      background: none;
+      border: none;
+      color: #fff;
+      text-align: left;
+      padding: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: transform 0.2s ease, background 0.3s ease, color 0.3s ease;
+    }
+
+
+
+    .tabs button.active {
+      /* background: linear-gradient(45deg, #ff6200, #ff8a33); */
+      background: #444;
+      color: #fff;
+      border-radius: 5px;
+      transform: scale(1.05);
+    }
+
+    .tabs button:hover {
+      transform: scale(1.1);
+      background: #444;
+      color: #ff8a33;
+      border-radius: 5px;
+
+    }
+
+    .loading-logo {
+      width: 100px;
+      height: 100px;
+      border: 8px solid #222;
+      border-top: 8px solid #ff6200;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .container {
+      width: 300px;
+      background: #111;
+      padding: 20px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+      visibility: hidden;
+      opacity: 0;
+      transform: translateY(50px);
+      transition: all 0.6s ease-out;
+      position: absolute;
+    }
+
+    .container.active {
+      visibility: visible;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    h1 {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+    }
+
+    .question {
+      margin-bottom: 15px;
+      font-size: 1rem;
+    }
+
+    .button {
+      background: linear-gradient(45deg, #ff6200, #ff8a33);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin: 10px 5px;
+      color: #fff;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 15px rgba(255, 134, 51, 0.8);
+    }
+
+    .logo-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #222;
+      width: 200px;
+      height: 200px;
+      border-radius: 20px;
+      transition: all 0.8s ease-out;
+      position: absolute;
+      opacity: 1;
+    }
+
+    .logo-container.shrink {
+      width: 60px;
+      height: 60px;
+      top: 10px;
+      left: 10px;
+      border-radius: 20px;
+      position: fixed;
+      opacity: 1;
+    }
+
+    .logo-container img {
+      width: 100%;
+      height: 100%;
+      border-radius: 20px;
+    }
+
+    .gui {
+      background: #111;
+      border-radius: 20px;
+      width: 0;
+      height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 1s ease-out;
+    }
+
+    .gui.open {
+      width: 80vw;
+      height: 90vh;
+      opacity: 1;
+    }
+
+    .tabs {
+      display: flex;
+      flex-direction: column;
+      background: #111;
+      width: 120px;
+      padding: 10px;
+      border-top-left-radius: 20px;
+      border-bottom-left-radius: 20px;
+    }
+
+    .tabs button {
+      background: none;
+      border: none;
+      color: #fff;
+      text-align: left;
+      padding: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s;
+    }
+
+    .tabs button:hover {
+      background: #444;
+    }
+
+    .content {
+      padding: 20px;
+      flex-grow: 1;
+      display: none;
+    }
+
+    .content.active {
+      display: block;
+    }
+
+    .status-panel {
+      background: #222;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+      text-align: left;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .status-panel img {
+      width: 40px;
+      height: 40px;
+      margin-right: 15px;
+      border-radius: 4px;
+    }
+
+    .status-panel h2 {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+
+    .status-panel p {
+      margin-bottom: 5px;
+    }
+
+    .setting-item {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      align-items: center;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .setting-label {
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .setting-input {
+      padding: 8px;
+      background: linear-gradient(45deg, #8c4d25, #ff8a33);
+      ;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      width: 60%;
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .version-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 75%;
+      margin-left: 10px;
+      height: 4px;
+      background: #8c4d25;
+      border-radius: 5px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .version-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      background-color: #ff8a33;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .version-slider::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      background-color: #ff8a33;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 34px;
+      height: 18px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 10px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked+.slider {
+      background-color: #ff8a33;
+    }
+
+    input:checked+.slider:before {
+      transform: translateX(16px);
+    }
+
+    .connecthelp {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      width: 100%;
+    }
+    .hidden {
+      display: none;
+    }
+
+    .loading-screen.hidden {
+      display: none;
+    }
+    textarea{
+      background-color: #2c3e50; /* Dark background color */
+      color: #ecf0f1; /* Light text color for readability */
+      border: 2px solid #34495e; /* Slightly lighter border */
+      border-radius: 8px; /* Rounded corners */
+      padding: 12px; /* Padding for inner spacing */
+      font-family: Arial, sans-serif; /* Font family */
+      font-size: 16px; /* Font size */
+      resize: vertical; /* Allows vertical resizing only */
+      width: 100%; /* Full width of the parent container */
+      box-sizing: border-box;
+      resize: none; /* Prevent resizing */
+      overflow: auto; /* Prevent the scrollbar */
+      scrollbar-width: none;
+    }
+    textarea:focus {
+  outline: none; /* Removes the default outline */
+  border-color: #ad6b38; /* Highlight the border when focused */
+  background-color: #34495e; /* Slightly lighter background on focus */
+}
+  </style>
+</head>
+
+<body>
+
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-logo"></div>
+  </div>
+
+  <div class="logo-container" id="logo">
+    <img src="Logo.jpg" alt="Logo" style="width: 100%; height: 100%;">
+  </div>
+
+   <div id="step1" class="container">
+    <h1>Подключение</h1>
+    <p class="question">Подключайтесь сюда с основного клиента</p>
+    <p id="ippc">0.0.0.0</p>
+    <button class="button" , onclick="copy('ippc')">Скопировать</button>
+    <br>
+    <button class="button" , onclick="act('step1',false,'status')">Готово</button>
+  </div>
+
+  <div id="step2" class="container">
+    <h1>Подключение</h1>
+    <p class="question">Подключайтесь к одному из IP со второго клиента</p>
+    <textarea id="ipmb" readonly></textarea>
+    <button class="button"  onclick="act('step2',false,'status')">Готово</button>
+  </div>
+
+  
+
+  <div class="tabs" id="tabs">
+    <button id="statusTab" onclick="switchTab('status')">Статус</button>
+    <button id="configTab" onclick="switchTab('config')">Настройки</button>
+  </div>
+
+  <div class="gui" id="gui">
+    <div style="display: flex; height: 100%;">
+      <div class="content" id="status-tab">
+        <h1>Клиенты</h1>
+        <div class="status-panel">
+          <img src="client.jpg" alt="Client 1">
+          <div class="connecthelp">
+
+            <div>
+              <h2>Первый клиент</h2>
+              <p id="status1">Загрузка</p>
+              <p></p>
+            </div>
+            <button class="button" onclick="act('step1',true)">Подключить</button>
+          </div>
+        </div>
+        <div class="status-panel">
+          <img src="client.jpg" alt="Client 2">
+          <div class="connecthelp">
+            <div>
+              <h2>Второй клиент</h2>
+              <p id="status2">Загрузка</p>
+              <p></p>
+            </div>
+            <button class="button" onclick="act('step2',true)">Подключить</button>
+          </div>
+        </div>
+        <button class="button" onclick="sendCommand('switchClients').then(r=>r&&alert(r))">Переключить клиенты</button>
+      </div>
+      <div class="content" id="logs-tab">
+        <h1>Логи</h1>
+        <p></p>
+      </div>
+      <div class="content" id="config-tab">
+        <div id="config" class="tab-content">
+          <h2>Настройки</h2>
+
+          <div class="settings">
+            <div class="setting-item">
+              <span class="setting-label">Ник:</span>
+              <input type="text" id="cfg_accountname" class="setting-input" placeholder="Введите ник">
+            </div>
+
+            <div class="setting-item">
+              <span class="setting-label">Сервер:</span>
+              <input type="text" id="cfg_host" class="setting-input" placeholder="Введите сервер">
+            </div>
+            <!-- <div class="setting-item">
+              <span class="setting-label">Порт сервера:</span>
+              <input type="text" id="cfg_port" class="setting-input" placeholder="Введите сервер">
+            </div> -->
+            <div class="setting-item">
+              <span class="setting-label">Версия:</span>
+              <div class="slider-container">
+                <input type="range" min="0" max="10" step="1" value="0.5" class="version-slider" id="versionSlider"
+                  oninput="updateVersionSmooth()">
+                <span id="versionDisplay">1.16.5</span>
+              </div>
+
+            </div>
+            <div class="setting-item">
+              <span class="setting-label">Включить обход на funtime.su</span>
+              <label class="switch">
+                <input type="checkbox" id="cfg_funtimeMode">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <!-- <div class="setting-item">
+              <span class="setting-label">Порт прокси:</span>
+              <input type="text" id="cfg_proxyport" class="setting-input" placeholder="Введите локальный порт (25565)">
+            </div> -->
+
+            <!-- <div class="setting-item">
+              <span class="setting-label">Порт ГУИ:</span>
+              <input type="text" id="cfg_GUIPort" class="setting-input" placeholder="Введите локальный порт (25565)">
+            </div> -->
+
+
+
+            <!-- <div class="setting-item">
+              <span class="setting-label">Скрывать GUI при отключении?</span>
+              <label class="switch">
+                <input type="checkbox" id="cfg_hideOnDisconnect">
+                <span class="slider"></span>
+              </label>
+            </div> -->
+
+          </div>
+          <button class="button" , onclick="saveConfig()">Сохранить</button>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <script src="./script.js"></script>
+  <script>
+
+    window.onload = async () => {
+      main()
+    };
+  </script>
+
+</body>
+
+</html>
